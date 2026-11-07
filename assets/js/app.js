@@ -271,7 +271,18 @@ async function collectSiteAssets(targetUrl) {
             downloaded.set(normalizedUrl, { type: 'binary', content: await response.blob() });
         } catch (error) {
             logMessage(`İçerik indirme hatası: ${normalizedUrl} - ${error.message}`);
+            if (normalizedUrl === rootUrl.href) {
+                throw new Error(
+                    `Ana sayfa indirilemedi. Hedef site CORS erişimine izin vermiyor olabilir. ` +
+                    `Tarayıcıdan farklı bir siteyi indirmek için sunucu taraflı bir servis gerekir. (${error.message})`
+                );
+            }
         }
+    }
+
+    const rootPage = downloaded.get(rootUrl.href);
+    if (!rootPage || rootPage.type !== 'html') {
+        throw new Error('Hedef siteden geçerli bir HTML ana sayfası alınamadı; ZIP oluşturulmadı.');
     }
 
     const zip = new JSZip();
@@ -293,11 +304,6 @@ async function collectSiteAssets(targetUrl) {
         zip.file(localFilePath, entry.content);
     });
 
-    const rootHtml = downloaded.get(rootUrl.href)?.content || '';
-    if (rootHtml) {
-        zip.file('index.html', rewriteHtmlDocument(rootHtml, rootUrl.href, fileMap));
-    }
-
     return zip;
 }
 
@@ -306,6 +312,7 @@ async function startCloning() {
 
     const input = document.getElementById('targetUrl');
     const button = document.querySelector('button');
+    const previousText = button?.textContent;
 
     if (!input || !button) {
         logMessage('Sayfa formu yüklenemedi.');
@@ -324,7 +331,6 @@ async function startCloning() {
             throw new Error('Geçerli bir HTTP/HTTPS URL girin.');
         }
 
-        const previousText = button.textContent;
         button.disabled = true;
         button.textContent = 'İndiriliyor...';
         logMessage(`Klonlama başlatıldı: ${siteUrl.href}`);
@@ -334,11 +340,13 @@ async function startCloning() {
 
         saveAs(blob, 'siteyedekle.zip');
         logMessage('ZIP dosyası indirildi.');
-        button.textContent = previousText;
-        button.disabled = false;
     } catch (error) {
         logMessage(`Klonlama hatası: ${error.message}`);
-        button.disabled = false;
+    } finally {
+        if (button) {
+            button.textContent = previousText;
+            button.disabled = false;
+        }
     }
 }
 
