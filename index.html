@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Sitelerini Statik İndirme Aracı</title>
+    
+    <!-- CSS Dosyası -->
+    <link rel="stylesheet" href="assets/css/style.css">
+
+    <!-- Harici JS Kütüphaneleri (CDN) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Web Sitelerini Statik İndirme Aracı</h2>
+        <p>Hedef Indexhibit sitesini tarayıcı üzerinden tamamen statik hale getirip ZIP olarak indirin.</p>
+        
+        <div class="form-group">
+            <input type="url" id="targetUrl" placeholder="http://hedef-indexhibit-sitesi.com/">
+            <button onclick="startCloning()">Siteyi Klonla ve ZIP İndir</button>
+        </div>
+
+        <div id="log" class="log-box">İşlem bekleniyor...</div>
+    </div>
+
+    <!-- Uygulama JS Kodu -->
+    <script src="assets/js/app.js"></script>
+</body>
+</html>
